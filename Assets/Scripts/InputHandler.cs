@@ -32,6 +32,18 @@ namespace PM
             _inputActions.Disable();
         }
 
+        public void TickInput(float delta)
+        {
+            MoveInput(delta);
+        }
 
+        private void MoveInput(float delta)
+        {
+            horizontal = _movementInput.x;
+            vertical = _movementInput.y;
+            moveAmount = Mathf.Clamp01(Mathf.Abs(horizontal) + Mathf.Abs(vertical));
+            mouseX = _cameraInput.x;
+            mouseY = _cameraInput.y;
+        }
     }
 }

@@ -2,17 +2,83 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerLocomotion : MonoBehaviour
-{
-    // Start is called before the first frame update
-    void Start()
+namespace PM 
+{ 
+    public class PlayerLocomotion : MonoBehaviour
     {
-        
-    }
+        private Transform _cameraObject;
+        private InputHandler _inputHandler;
+        private Vector3 _moveDirection;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        [HideInInspector] public Transform myTransform;
+        [HideInInspector] public new Rigidbody rigidbody;
+        [HideInInspector] public GameObject normalCamera;
+        [HideInInspector] public AnimatorHandler animatorHandler;
+
+        [Header("Stats")]
+        [SerializeField] private float _movementSpeed = 5f;
+        [SerializeField] private float _rotationSpeed = 10f;
+
+
+        void Start()
+        {
+            rigidbody = GetComponent<Rigidbody>();
+            _inputHandler = GetComponent<InputHandler>();
+            animatorHandler = GetComponentInChildren<AnimatorHandler>();
+            _cameraObject = Camera.main.transform;
+            myTransform = transform;
+            animatorHandler.Initialize();
+        }
+
+        public void Update()
+        {
+            float delta = Time.deltaTime;
+
+            _inputHandler.TickInput(delta);
+           
+            _moveDirection = _cameraObject.forward * _inputHandler.vertical;
+            _moveDirection += _cameraObject.right * _inputHandler.horizontal;
+            _moveDirection.Normalize();
+
+            float speed = _movementSpeed;
+            _moveDirection *= speed;
+
+            Vector3 projectedVelocity = Vector3.ProjectOnPlane(_moveDirection, _normalVector);
+            rigidbody.velocity = projectedVelocity;
+
+            animatorHandler.UpdateAnimatorValues(_inputHandler.moveAmount, 0);
+
+            if (animatorHandler.canRotate)
+            {
+                HandleRotation(delta);
+            }
+        }
+
+        #region Movement
+        private Vector3 _normalVector;
+        private Vector3 _targetPosition;
+
+        private void HandleRotation (float delta)
+        {
+            Vector3 targetDirection = Vector3.zero;
+            float moveOverride = _inputHandler.moveAmount;
+
+            targetDirection = _cameraObject.forward * _inputHandler.vertical;
+            targetDirection += _cameraObject.right * _inputHandler.horizontal;
+
+            targetDirection.Normalize();
+            targetDirection.y = 0;
+
+            if (targetDirection == Vector3.zero)
+                targetDirection = myTransform.forward;
+
+            float smoothingRotationSpeed = _rotationSpeed;
+
+            Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
+            Quaternion smoothedTargetRotation = Quaternion.Slerp(myTransform.rotation, targetRotation, smoothingRotationSpeed * delta);
+
+            myTransform.rotation = smoothedTargetRotation;
+        }
+        #endregion
     }
 }
