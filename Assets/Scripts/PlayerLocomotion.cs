@@ -39,6 +39,7 @@ namespace PM
             _moveDirection = _cameraObject.forward * _inputHandler.vertical;
             _moveDirection += _cameraObject.right * _inputHandler.horizontal;
             _moveDirection.Normalize();
+            _moveDirection.y = 0;
 
             float speed = _movementSpeed;
             _moveDirection *= speed;

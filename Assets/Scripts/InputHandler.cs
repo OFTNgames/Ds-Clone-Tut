@@ -13,8 +13,15 @@ namespace PM
         public float mouseY;
 
         private PlayerControls _inputActions;
+        private CameraHandler _cameraHandler;
+
         private Vector2 _movementInput;
         private Vector2 _cameraInput;
+
+        private void Awake()
+        {
+            _cameraHandler = CameraHandler.singleton;
+        }
 
         public void OnEnable()
         {
@@ -27,10 +34,17 @@ namespace PM
             _inputActions.Enable();
         }
 
-        private void OnDisable()
+        private void FixedUpdate()
         {
-            _inputActions.Disable();
+            float delta = Time.fixedDeltaTime;
+
+            if(_cameraHandler != null)
+            {
+                _cameraHandler.FollowTarget(delta);
+                _cameraHandler.HandleCameraRotation(delta, mouseX, mouseY);
+            }
         }
+
 
         public void TickInput(float delta)
         {
@@ -44,6 +58,10 @@ namespace PM
             moveAmount = Mathf.Clamp01(Mathf.Abs(horizontal) + Mathf.Abs(vertical));
             mouseX = _cameraInput.x;
             mouseY = _cameraInput.y;
+        }
+        private void OnDisable()
+        {
+            _inputActions.Disable();
         }
     }
 }
