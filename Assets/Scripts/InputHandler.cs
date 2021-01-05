@@ -12,6 +12,10 @@ namespace PM
         public float mouseX;
         public float mouseY;
 
+        public bool b_Input;
+        public bool rollFlag;
+        public bool isInteracting;
+
         private PlayerControls _inputActions;
         private CameraHandler _cameraHandler;
 
@@ -49,6 +53,7 @@ namespace PM
         public void TickInput(float delta)
         {
             MoveInput(delta);
+            HandelRollInput(delta);
         }
 
         private void MoveInput(float delta)
@@ -59,6 +64,17 @@ namespace PM
             mouseX = _cameraInput.x;
             mouseY = _cameraInput.y;
         }
+
+        private void HandelRollInput(float delta)
+        {
+            b_Input = _inputActions.PlayerActions.Rolling.phase == UnityEngine.InputSystem.InputActionPhase.Started;
+
+            if (b_Input)
+            {
+                rollFlag = true;
+            }
+        }
+
         private void OnDisable()
         {
             _inputActions.Disable();
