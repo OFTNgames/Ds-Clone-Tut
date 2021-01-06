@@ -6,26 +6,20 @@ namespace PM
 {
     public class InputHandler : MonoBehaviour
     {
+        private PlayerControls _inputActions;
+        private Vector2 _movementInput;
+        private Vector2 _cameraInput;
+
         public float horizontal;
         public float vertical;
         public float moveAmount;
         public float mouseX;
         public float mouseY;
-
         public bool b_Input;
         public bool rollFlag;
-        public bool isInteracting;
-
-        private PlayerControls _inputActions;
-        private CameraHandler _cameraHandler;
-
-        private Vector2 _movementInput;
-        private Vector2 _cameraInput;
-
-        private void Awake()
-        {
-            _cameraHandler = CameraHandler.singleton;
-        }
+        public bool sprintFlag;
+        public float rollInputTimer;
+        
 
         public void OnEnable()
         {
@@ -37,18 +31,6 @@ namespace PM
             }
             _inputActions.Enable();
         }
-
-        private void FixedUpdate()
-        {
-            float delta = Time.fixedDeltaTime;
-
-            if(_cameraHandler != null)
-            {
-                _cameraHandler.FollowTarget(delta);
-                _cameraHandler.HandleCameraRotation(delta, mouseX, mouseY);
-            }
-        }
-
 
         public void TickInput(float delta)
         {
@@ -71,7 +53,17 @@ namespace PM
 
             if (b_Input)
             {
-                rollFlag = true;
+                rollInputTimer += delta;
+                sprintFlag = true;
+            }
+            else
+            {
+                if(rollInputTimer > 0 && rollInputTimer < 0.5f)
+                {
+                    sprintFlag = false;
+                    rollFlag = true;
+                }
+                rollInputTimer = 0;
             }
         }
 

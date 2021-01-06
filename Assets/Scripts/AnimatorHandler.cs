@@ -7,8 +7,11 @@ namespace PM
     public class AnimatorHandler : MonoBehaviour
     {
         public Animator animator;
-        public InputHandler inputHandler;
-        public PlayerLocomotion playerLocomotion;
+
+        private InputHandler _inputHandler;
+        private PlayerLocomotion _playerLocomotion;
+        private PlayerManager _playerManager;
+        
         public bool canRotate;
 
         private int _vertical;
@@ -16,14 +19,15 @@ namespace PM
 
         public void Initialize()
         {
+            _playerManager = GetComponentInParent<PlayerManager>();
             animator = GetComponent<Animator>();
-            inputHandler = GetComponentInParent<InputHandler>();
-            playerLocomotion = GetComponentInParent<PlayerLocomotion>();
+            _inputHandler = GetComponentInParent<InputHandler>();
+            _playerLocomotion = GetComponentInParent<PlayerLocomotion>();
             _vertical = Animator.StringToHash("Vertical");
             _horizontal = Animator.StringToHash("Horizontal");
         }
 
-        public void UpdateAnimatorValues(float verticalMovement, float horizontalMovement)
+        public void UpdateAnimatorValues(float verticalMovement, float horizontalMovement, bool isSprinting)
         {
             #region Vertical
             float v = 0;
@@ -75,6 +79,12 @@ namespace PM
             }
             #endregion
 
+            if (isSprinting)
+            {
+                v = 2;
+                h = horizontalMovement;
+            }
+
             animator.SetFloat(_vertical, v, 0.1f, Time.deltaTime);
             animator.SetFloat(_horizontal, h, 0.1f, Time.deltaTime);
         }
@@ -98,15 +108,15 @@ namespace PM
 
         private void OnAnimatorMove()
         {
-            if (inputHandler.isInteracting == false)
+            if (_playerManager.isInteracting == false)
                 return;
 
             float delta = Time.deltaTime;
-            playerLocomotion.rigidbody.drag = 0;
+            _playerLocomotion.rigidbody.drag = 0;
             Vector3 deltaPosition = animator.deltaPosition;
             deltaPosition.y = 0;
             Vector3 velocity = deltaPosition / delta;
-            playerLocomotion.rigidbody.velocity = velocity; 
+            _playerLocomotion.rigidbody.velocity = velocity; 
         }
     }
 }

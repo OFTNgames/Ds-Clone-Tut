@@ -53,8 +53,8 @@ namespace PM
 
         public void HandleCameraRotation(float delta, float mouseXInput, float mouseYInput)
         {
-            _lookAngle += (mouseXInput * lookSpeed) / delta;
-            _pivotAngle -= (mouseYInput * pivotSpeed) / delta;
+            _lookAngle += (mouseXInput * lookSpeed) * delta;
+            _pivotAngle -= (mouseYInput * pivotSpeed) * delta;
             _pivotAngle = Mathf.Clamp(_pivotAngle, minimumPivot, maximumPivot);
 
             Vector3 rotation = Vector3.zero;

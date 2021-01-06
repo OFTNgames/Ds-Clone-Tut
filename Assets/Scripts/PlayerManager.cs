@@ -8,16 +8,46 @@ namespace PM
     {
         private InputHandler _inputHandler;
         private Animator _animator;
-        void Start()
+        private CameraHandler _cameraHandler;
+        private PlayerLocomotion _playerLocomotion;
+
+        public bool isInteracting;
+        [Header("Player Flags")]
+        public bool isSprinting;
+
+        private void Awake()
+        {
+            _cameraHandler = CameraHandler.singleton;
+        }
+        private void Start()
         {
             _inputHandler = GetComponent<InputHandler>();
             _animator = GetComponentInChildren<Animator>();
+            _playerLocomotion = GetComponent<PlayerLocomotion>();
         }
 
-        void Update()
+        private void Update()
         {
-            _inputHandler.isInteracting = _animator.GetBool("isInteracting");
+            float delta = Time.deltaTime;
+            isInteracting = _animator.GetBool("isInteracting");
+            
+            isSprinting = _inputHandler.b_Input;
+            _inputHandler.TickInput(delta);
+            _playerLocomotion.HandleMovement(delta);
+            _playerLocomotion.HandleRollingAndSprinting(delta);
+
+            if (_cameraHandler != null)
+            {
+                _cameraHandler.FollowTarget(delta);
+                _cameraHandler.HandleCameraRotation(delta, _inputHandler.mouseX, _inputHandler.mouseY);
+            }
+        }
+
+        private void LateUpdate()
+        {
             _inputHandler.rollFlag = false;
+            _inputHandler.sprintFlag = false;
+            isSprinting = _inputHandler.b_Input;
         }
     }
 }
