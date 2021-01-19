@@ -14,6 +14,8 @@ namespace PM
         public bool isInteracting;
         [Header("Player Flags")]
         public bool isSprinting;
+        public bool isInAir;
+        public bool isGrounded;
 
         private void Awake()
         {
@@ -35,6 +37,7 @@ namespace PM
             _inputHandler.TickInput(delta);
             _playerLocomotion.HandleMovement(delta);
             _playerLocomotion.HandleRollingAndSprinting(delta);
+            _playerLocomotion.HandleFalling(delta, _playerLocomotion.moveDirection);
 
             if (_cameraHandler != null)
             {
@@ -48,6 +51,11 @@ namespace PM
             _inputHandler.rollFlag = false;
             _inputHandler.sprintFlag = false;
             isSprinting = _inputHandler.b_Input;
+
+            if (isInAir)
+            {
+                _playerLocomotion.inAirTimer = _playerLocomotion.inAirTimer + Time.deltaTime;
+            }
         }
     }
 }
